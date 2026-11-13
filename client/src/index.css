@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#0a0d14] text-slate-100 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Custom TV & Dashboard scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f141f;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #273147;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #384666;
+  }
+}
+
+@layer utilities {
+  .tv-focus-glow {
+    outline: 3px solid #38bdf8;
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.7);
+    transform: scale(1.03);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 20;
+  }
+
+  .glass-panel {
+    background: rgba(18, 23, 34, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card {
+    background: rgba(27, 34, 52, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+}
+

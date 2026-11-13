@@ -1,0 +1,27 @@
+{
+  "name": "screenroom",
+  "version": "1.0.0",
+  "description": "ScreenRoom — Smart TV Wireless File Sharing, Gallery & Document Viewer",
+  "type": "module",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "start": "node server/server.js",
+    "build": "cd client && npm run build",
+    "test": "node server/test-e2e.js",
+    "test:r2": "node server/test-r2.js"
+  },
+  "keywords": [
+    "smart-tv",
+    "file-sharing",
+    "qr-code",
+    "pdf-viewer",
+    "video-streaming",
+    "socket-io",
+    "react",
+    "express"
+  ],
+  "author": "ScreenRoom Team",
+  "license": "MIT"
+}
+
