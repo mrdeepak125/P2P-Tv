@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Film,
 } from 'lucide-react';
+import { getMediaUrl } from '../../api/apiClient';
 
 function formatTime(seconds) {
   if (isNaN(seconds)) return '0:00';
@@ -187,7 +188,7 @@ export function VideoPlayer({
       {/* Video Stream Element */}
       <video
         ref={videoRef}
-        src={file.url}
+        src={getMediaUrl(file.url)}
         playsInline
         autoPlay
         onPlay={() => setIsPlaying(true)}

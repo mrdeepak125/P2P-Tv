@@ -167,12 +167,18 @@ export async function streamMedia(req, res) {
     if (!fs.existsSync(filePath) && isR2Configured()) {
       try {
         const r2Response = await getR2Stream({ filename: safeFilename, range });
-        res.writeHead(range ? 206 : 200, {
+        const headers = {
           'Content-Type': r2Response.ContentType || contentType,
           'Content-Length': r2Response.ContentLength,
-          'Content-Range': r2Response.ContentRange,
           'Accept-Ranges': 'bytes',
-        });
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+          'Cross-Origin-Resource-Policy': 'cross-origin',
+        };
+        if (r2Response.ContentRange) {
+          headers['Content-Range'] = r2Response.ContentRange;
+        }
+        res.writeHead(range ? 206 : 200, headers);
         r2Response.Body.pipe(res);
         return;
       } catch (r2Err) {
@@ -206,6 +212,9 @@ export async function streamMedia(req, res) {
         'Accept-Ranges': 'bytes',
         'Content-Length': chunkSize,
         'Content-Type': contentType,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
       };
 
       res.writeHead(206, head);
@@ -215,6 +224,9 @@ export async function streamMedia(req, res) {
         'Content-Length': fileSize,
         'Content-Type': contentType,
         'Accept-Ranges': 'bytes',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
       };
       res.writeHead(200, head);
       fs.createReadStream(filePath).pipe(res);

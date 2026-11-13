@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, Film, FileText, Sparkles, Play } from 'lucide-react';
+import { getMediaUrl } from '../../api/apiClient';
 
 export function TVCardItem({ file, isFocused, isNew, onSelect }) {
   const isImage = file.fileType === 'image';
@@ -27,7 +28,7 @@ export function TVCardItem({ file, isFocused, isNew, onSelect }) {
       <div className="relative aspect-video w-full bg-slate-950/60 overflow-hidden flex items-center justify-center">
         {isImage && (
           <img
-            src={file.url}
+            src={getMediaUrl(file.url)}
             alt={file.originalName}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
@@ -37,7 +38,7 @@ export function TVCardItem({ file, isFocused, isNew, onSelect }) {
         {isVideo && (
           <div className="relative w-full h-full flex items-center justify-center bg-slate-950">
             <video
-              src={`${file.url}#t=0.5`}
+              src={`${getMediaUrl(file.url)}#t=0.5`}
               preload="metadata"
               className="w-full h-full object-cover opacity-60"
             />

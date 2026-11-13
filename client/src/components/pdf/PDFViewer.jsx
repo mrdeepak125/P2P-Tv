@@ -16,6 +16,7 @@ import {
   Layers,
   ExternalLink,
 } from 'lucide-react';
+import { getMediaUrl } from '../../api/apiClient';
 
 // Setup resilient worker configuration with fallback
 try {
@@ -50,7 +51,7 @@ export function PDFViewer({ file, onClose, isTV = false }) {
     let isMounted = true;
 
     const loadingTask = pdfjsLib.getDocument({
-      url: file.url,
+      url: getMediaUrl(file.url),
       withCredentials: false,
       // If external worker fails, continue without worker
       stopAtErrors: false,
@@ -329,7 +330,7 @@ export function PDFViewer({ file, onClose, isTV = false }) {
         {useNativeFallback ? (
           <div className="w-full h-full max-w-5xl bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 flex flex-col">
             <iframe
-              src={`${file.url}#toolbar=1&navpanes=0`}
+              src={`${getMediaUrl(file.url)}#toolbar=1&navpanes=0`}
               title={file.originalName}
               className="w-full h-full flex-1 border-0"
             />

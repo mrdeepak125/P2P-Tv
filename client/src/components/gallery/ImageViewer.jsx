@@ -12,6 +12,7 @@ import {
   Sparkles,
   Move,
 } from 'lucide-react';
+import { getMediaUrl } from '../../api/apiClient';
 
 export function ImageViewer({
   file,
@@ -245,7 +246,7 @@ export function ImageViewer({
           }}
         >
           <img
-            src={file.url}
+            src={getMediaUrl(file.url)}
             alt={file.originalName}
             className="max-h-[82vh] max-w-[92vw] object-contain rounded-xl shadow-[0_0_60px_rgba(0,0,0,0.9)] transition-all duration-200 pointer-events-auto"
             draggable={false}

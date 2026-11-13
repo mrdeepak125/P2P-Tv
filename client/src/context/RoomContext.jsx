@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { apiClient } from '../api/apiClient';
+import { apiClient, BACKEND_BASE, normalizeFile } from '../api/apiClient';
 import { useToast } from './ToastContext';
 
 const RoomContext = createContext(null);
@@ -107,15 +107,9 @@ export function RoomProvider({ children }) {
       socketRef.current.disconnect();
     }
 
-    const backendUrl =
-      import.meta.env.VITE_BACKEND_URL ||
-      (typeof window !== 'undefined' && window.location.port === '3000'
-        ? `${window.location.protocol}//${window.location.hostname}:5000`
-        : '');
-
-    const socket = io(backendUrl || undefined, {
+    const socket = io(BACKEND_BASE, {
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 15,
+      reconnectionAttempts: 20,
       reconnectionDelay: 1000,
     });
 
@@ -180,12 +174,13 @@ export function RoomProvider({ children }) {
     // Real-time files uploaded
     socket.on('files-uploaded', (data) => {
       const { files, uploaderName } = data;
-      showToast(`${uploaderName || 'Device'} uploaded ${files.length} new file(s)!`, 'success');
+      const normalizedFiles = (files || []).map(normalizeFile);
+      showToast(`${uploaderName || 'Device'} uploaded ${normalizedFiles.length} new file(s)!`, 'success');
 
       // Track newly added IDs for "NEW" indicator
       setNewFileIds((prev) => {
         const next = new Set(prev);
-        files.forEach((f) => next.add(f.fileId));
+        normalizedFiles.forEach((f) => next.add(f.fileId));
         return next;
       });
 
@@ -193,7 +188,7 @@ export function RoomProvider({ children }) {
         if (!prev) return null;
         return {
           ...prev,
-          files: [...(prev.files || []), ...files],
+          files: [...(prev.files || []), ...normalizedFiles],
           activities: [data.activity, ...(prev.activities || [])],
         };
       });

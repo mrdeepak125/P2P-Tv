@@ -1,10 +1,45 @@
-const BACKEND_BASE =
-  import.meta.env.VITE_BACKEND_URL ||
-  (typeof window !== 'undefined' && window.location.port === '3000'
+export const BACKEND_BASE =
+  (import.meta.env.VITE_BACKEND_URL && import.meta.env.VITE_BACKEND_URL.trim()) ||
+  (typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? `${window.location.protocol}//${window.location.hostname}:5000`
-    : '');
+    : 'https://p2p-tv.onrender.com');
 
-const API_BASE = `${BACKEND_BASE}/api`;
+export const API_BASE = `${BACKEND_BASE}/api`;
+
+/**
+ * Resolves a media file path (whether absolute, relative, R2, or disk) to an accessible URL
+ */
+export function getMediaUrl(url) {
+  if (!url) return '';
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('blob:') ||
+    url.startsWith('data:')
+  ) {
+    return url;
+  }
+  const cleanBase = BACKEND_BASE.replace(/\/$/, '');
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${cleanBase}${cleanPath}`;
+}
+
+export function normalizeFile(file) {
+  if (!file) return file;
+  return {
+    ...file,
+    url: getMediaUrl(file.url),
+  };
+}
+
+export function normalizeRoom(room) {
+  if (!room) return room;
+  return {
+    ...room,
+    files: Array.isArray(room.files) ? room.files.map(normalizeFile) : [],
+  };
+}
 
 export const apiClient = {
   /**
@@ -18,7 +53,7 @@ export const apiClient = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Failed to create room');
-    return json.room;
+    return normalizeRoom(json.room);
   },
 
   /**
@@ -28,7 +63,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/rooms/code/${encodeURIComponent(code)}`);
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Room not found');
-    return json.room;
+    return normalizeRoom(json.room);
   },
 
   /**
@@ -40,7 +75,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/rooms/${encodeURIComponent(roomId)}`, { headers });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Failed to get room');
-    return json.room;
+    return normalizeRoom(json.room);
   },
 
   /**
@@ -82,7 +117,8 @@ export const apiClient = {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const resp = JSON.parse(xhr.responseText);
-            resolve(resp.files || []);
+            const files = (resp.files || []).map(normalizeFile);
+            resolve(files);
           } catch (err) {
             reject(new Error('Invalid upload response'));
           }
@@ -148,7 +184,7 @@ export const apiClient = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || 'Failed to rename file');
-    return json.file;
+    return normalizeFile(json.file);
   },
 
   /**
@@ -173,4 +209,3 @@ export const apiClient = {
     return json;
   },
 };
-

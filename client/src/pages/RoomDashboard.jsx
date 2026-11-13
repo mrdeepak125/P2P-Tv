@@ -24,7 +24,7 @@ import {
   X,
 } from 'lucide-react';
 import { useRoom } from '../context/RoomContext';
-import { apiClient } from '../api/apiClient';
+import { apiClient, getMediaUrl } from '../api/apiClient';
 import { useToast } from '../context/ToastContext';
 import { FileUploadModal } from '../components/upload/FileUploadModal';
 import { VirtualTVRemote } from '../components/mobile/VirtualTVRemote';
@@ -347,7 +347,7 @@ export function RoomDashboard() {
                     >
                       {isImage && (
                         <img
-                          src={file.url}
+                          src={getMediaUrl(file.url)}
                           alt={file.originalName}
                           className="w-full h-full object-cover transition duration-300 group-hover:scale-105"
                           loading="lazy"
@@ -356,7 +356,7 @@ export function RoomDashboard() {
                       {isVideo && (
                         <div className="relative w-full h-full flex items-center justify-center">
                           <video
-                            src={`${file.url}#t=0.5`}
+                            src={`${getMediaUrl(file.url)}#t=0.5`}
                             preload="metadata"
                             className="w-full h-full object-cover opacity-60"
                           />

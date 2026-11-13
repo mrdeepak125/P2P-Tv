@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import http from 'http';
+import fs from 'fs';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -64,7 +65,7 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/messages', messageRoutes);
 
-// Health check
+// Root & Health checks
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -73,9 +74,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.get('/', (req, res, next) => {
+  const CLIENT_DIST = path.resolve(__dirname, '../client/dist');
+  if (fs.existsSync(path.join(CLIENT_DIST, 'index.html'))) {
+    return next();
+  }
+  res.json({
+    name: 'ScreenRoom API Backend',
+    status: 'online',
+    frontend: 'https://p2ptv.vercel.app',
+    health: '/api/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Serve frontend build if present
 const CLIENT_DIST = path.resolve(__dirname, '../client/dist');
-import fs from 'fs';
 if (fs.existsSync(CLIENT_DIST)) {
   app.use(express.static(CLIENT_DIST));
   app.get('*', (req, res, next) => {
